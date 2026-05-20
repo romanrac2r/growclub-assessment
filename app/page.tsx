@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronRight, Users, ShieldAlert, CheckCircle2, Info, 
-  AlertTriangle, LayoutDashboard, User, BarChart3, ArrowRight, Search
+  AlertTriangle, LayoutDashboard, BarChart3, Mail, BookOpen, Target
 } from 'lucide-react';
 
 const supabase = createClient(
@@ -13,82 +13,101 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// --- KOMPLETNÁ DATABÁZA ZO VŠETKÝCH PDF ---
 const VALUES_DB: any = {
   BLUE: [
-    { v: "Poriadok", pos: "Mám rád, keď veci fungujú podľa jasných pravidiel a zabehnutých postupov.", neg: "Vytvára paralyzujúcu byrokraciu a strach z odchýlok." },
-    { v: "Stabilita", pos: "Vyhľadávam predvídateľnosť a chránim seba aj tím pred chaosom.", neg: "Zamŕza v status quo a dogmaticky blokuje inovácie." },
-    { v: "Morálka", pos: "Zásadne dodržiavam sľuby a konám čestne aj bez osobných výhod.", neg: "Povýšenecké moralizovanie a farizejstvo." },
-    { v: "Disciplína", pos: "Mám silnú sebadisciplínu; vyžadujem dodržiavanie dohôd u seba aj iných.", neg: "Toxický mikromanažment a kultúra strachu." },
-    { v: "Presnosť", pos: "Potrpím si na presné detaily a bezchybnosť v práci aj doma.", neg: "Analysis paralysis – utápanie sa v detailoch." },
-    { v: "Štruktúra", pos: "Potrebujem jasné rozdelenie úloh, aby každý vedel, za čo nesie zodpovednosť.", neg: "Vytváranie nepriechodných izolovaných oddelení (silos)." },
-    { v: "Lojálnosť", pos: "Som verný rodine aj firme; v krízach ich vždy chránim.", neg: "Vyžadovanie slepej poslušnosti, kritiku berie ako zradu." },
-    { v: "Pracovitosť", pos: "Verím v poctivú tvrdú prácu a idem ostatným osobným príkladom.", neg: "Glorifikácia workoholizmu a vyčerpania." },
-    { v: "Plnenie povinností", pos: "K záväzkom pristupujem s maximálnou vážnosťou a spoľahlivosťou.", neg: "Úzkoprsý alibizmus na štýl 'to nie je moja práca'." },
-    { v: "Skromnosť", pos: "Úspechy radšej pripisujem spoločnému úsiliu než len sebe samému.", neg: "Falošná skromnosť prechádzajúca do mučeníctva." }
+    { v: "Poriadok", pos: "Mám rád, keď veci fungujú podľa jasných pravidiel a zmysluplného systému.", neg: "Vytvára paralyzujúcu byrokraciu a strach z akýchkoľvek odchýlok." },
+    { v: "Stabilita", pos: "Vyhľadávam predvídateľnosť a chránim seba aj tím pred nečakaným chaosom.", neg: "Zamŕza v status quo a dogmaticky blokuje nevyhnutné inovácie." },
+    { v: "Morálka", pos: "Zásadne dodržiavam svoje sľuby a konám čestne aj v situáciách znižujúcich zisk.", neg: "Povýšenecké moralizovanie a verejné pranierovanie iných za prehrešky." },
+    { v: "Disciplína", pos: "Vyžadujem zodpovedný prístup k termínom a vysokú mieru sebakontroly.", neg: "Toxický mikromanažment a vytváranie kultúry všadeprítomného strachu." },
+    { v: "Presnosť", pos: "Potrpím si na jasnosť a bezchybnosť; dbám na vysoký štandard výstupov.", neg: "Analysis paralysis – utápanie sa v detailoch pri hľadaní utopickej istoty." },
+    { v: "Štruktúra", pos: "Potrebujem jasné rozdelenie kompetencií, aby nedochádzalo k duplicite práce.", neg: "Vytváranie nepriechodných izolovaných oddelení (silos) bez komunikácie." },
+    { v: "Lojálnosť", pos: "Stojím za svojím tímom v krízach a budujem pocit bezpečia a dôvery.", neg: "Vyžadovanie slepej poslušnosti; kritiku vníma ako osobnú zradu." },
+    { v: "Pracovitosť", pos: "Verím v poctivú prácu, idem príkladom a oceňujem vytrvalosť.", neg: "Glorifikácia vyčerpania a workoholizmu ako jedinej normy hodnoty." },
+    { v: "Plnenie povinností", pos: "K záväzkom pristupujem s maximálnou vážnosťou a spoľahlivo ich doručím.", neg: "Úzkoprsý alibizmus založený na vete 'to nie je v mojej pracovnej náplni'." },
+    { v: "Skromnosť", pos: "Nepovyšujem svoje ego nad pravidlá a kredit za úspech presúvam na celý tím.", neg: "Umele potláča zaslúžené oslavy úspechu z pozície ublíženého martýra." }
   ],
   ORANGE: [
-    { v: "Logika", pos: "Rozhodujem sa výlučne na základe faktov, dát a racionálneho úsudku.", neg: "Chladná slepota voči ľudskej psychológii a emóciám." },
-    { v: "Úspech", pos: "Motivuje ma dosahovanie výsledkov a prekonávanie ambicióznych cieľov.", neg: "Princíp 'účel svätí prostriedky' na úkor zdravia ľudí." },
-    { v: "Jasné ciele", pos: "Svoj život riadim podľa presne merateľných metrík a ukazovateľov.", neg: "Stanovovanie nesplniteľných a stresujúcich cieľov." },
-    { v: "Ambicióznosť", pos: "Neuspokojím sa s priemerom, chcem neustále osobnostne aj kariérne rásť.", neg: "Narcistická chamtivosť a ignorancia reálnych kapacít." },
-    { v: "Zvedavosť", pos: "Rád objavujem nové technológie a trendy pre vyššiu efektivitu.", neg: "Syndróm blýskavých objektov – skákanie od trendu k trendu." },
-    { v: "Kreativita", pos: "Baví ma prichádzať s inovatívnymi nápadmi a nebojím sa testovať nové veci.", neg: "Neukotvené snívanie a odmietanie prevádzkovej reality." },
-    { v: "Optimizmus", pos: "V náročných situáciách zachovávam neoblomnú vieru v úspešný koniec.", neg: "Toxická pozitivita – zakazovanie pomenovať reálne hrozby." },
-    { v: "Profesionalita", pos: "Zakladám si na špičkovej kvalite práce a vecnej asertívnej komunikácii.", neg: "Budovanie odstupu cez korporátny žargón bez ľudskosti." },
-    { v: "Dokonalosť", pos: "Neustále hľadám spôsoby ako optimalizovať svoje zvyky pre excelentnosť.", neg: "Paralyzujúci perfekcionizmus, ktorý zdržuje projekty." },
-    { v: "Prosperita", pos: "Dôležité je budovať materiálne zázemie a stabilný finančný rast.", neg: "Agresívne osekávanie nákladov pre krátkodobé dividendy." },
-    { v: "Peniaze", pos: "Vnímam ich ako objektívne meradlo môjho úspechu a pridanej hodnoty.", neg: "Zneužívanie peňazí ako nástroja moci, korupcie a vydierania." },
-    { v: "Nezávislosť", pos: "Najlepšie fungujem s plnou autonómiou a voľnosťou v rozhodovaní.", neg: "Extrémny individualizmus prechádzajúci do izolácie." },
-    { v: "Seba-vyjadrenie", pos: "Rád prezentujem svoje schopnosti, budujem si meno a som jedinečný.", neg: "Narcistická exhibícia a privlastňovanie si zásluh tímu." }
+    { v: "Logika", pos: "Rozhodujem sa výlučne na základe tvrdých dát a racionálneho úsudku.", neg: "Chladná slepota voči ľudskej psychológii a emocionálnym dopadom." },
+    { v: "Úspech", pos: "Motivuje ma dosahovanie viditeľných výsledkov a prekonávanie cieľov.", neg: "Princíp 'účel svätí prostriedky' na úkor zdravia a etiky." },
+    { v: "Jasné ciele", pos: "Svoj život riadim podľa presne merateľných metrík a vízií.", neg: "Chaotické menenie cieľov alebo nastavovanie nesplniteľných metrík." },
+    { v: "Ambicióznosť", pos: "Neuspokojím sa s priemerom; neustále hľadám nové príležitosti pre rast.", neg: "Narcistická chamtivosť a naivná expanzia bez reálnych zdrojov." },
+    { v: "Zvedavosť", pos: "Aktívne podporujem výskum a inovácie bez okamžitého tlaku na zisk.", neg: "Syndróm blýskavých objektov – skákanie od trendu k trendu bez doťahovania." },
+    { v: "Kreativita", pos: "Budujem bezpečné prostredie pre nápady a zlyhanie vnímam ako učenie.", neg: "Generovanie nesplniteľných vízií a trestanie pragmatických pripomienok." },
+    { v: "Optimizmus", pos: "V náročných situáciách zachovávam neoblomnú vieru v úspešný koniec.", neg: "Toxická pozitivita – zakazovanie pomenovať reálne finančné riziká." },
+    { v: "Profesionalita", pos: "Reprezentujem firmu na vysokej úrovni cez vecnú asertívnu komunikáciu.", neg: "Budovanie odstupu cez korporátny žargón a odmietanie ľudskosti." },
+    { v: "Dokonalosť", pos: "Optimalizujem procesy tak, aby som dosiahol maximálnu možnú efektivitu.", neg: "Paralyzujúci perfekcionizmus, ktorý zdržuje spustenie kvôli detailom." },
+    { v: "Prosperita", pos: "Strategicky riadim rast a zabezpečujem férové finančné ohodnotenie tímu.", neg: "Agresívne osekávanie nákladov len pre maximalizáciu krátkodobých ziskov." },
+    { v: "Peniaze", pos: "Peniaze vnímam ako transparentný nástroj merania zdravia firmy a úspechu.", neg: "Zneužívanie peňazí ako nástroja moci, korupcie a kupovania si poslušnosti." },
+    { v: "Nezávislosť", pos: "Decentralizujem riadenie a plne rešpektujem autonómiu expertov v tíme.", neg: "Extrémny individualizmus; budovanie izolovaných impérií v rámci firmy." },
+    { v: "Seba-vyjadrenie", pos: "Podporujem ľudí v budovaní ich osobnej značky a prezentácii unikátnych ideí.", neg: "Čistý narcizmus; kradnutie nápadov iných a monopol na pozornosť." }
   ],
   GREEN: [
-    { v: "Harmónia", pos: "Záleží mi na pokojných vzťahoch a prirodzene pôsobím ako mediátor.", neg: "Strach z konfliktu a zametanie toxicity pod koberec." },
-    { v: "Súdržnosť", pos: "Robím všetko pre to, aby rodina a tím držali pevne pokope.", neg: "Groupthink – pasívne-agresívne trestanie iného názoru." },
-    { v: "Spravodlivosť", pos: "Citlivo vnímam potreby znevýhodnených a dbám na férové šance.", neg: "Uplatňovanie kolektívnej viny a rovnostárskej utópie." },
-    { v: "Rovnosť", pos: "Ku každému pristupujem s rovnakou úctou bez ohľadu na status.", neg: "Popieranie hierarchie kompetencií, chaos v riadení." },
-    { v: "Konsenzus", pos: "Nerád vnucujem riešenia, hľadám trpezlivú zhodu s väčšinou.", neg: "Kríza rozhodovania – neschopnosť urobiť krok bez každého." },
-    { v: "Spolupatričnosť", pos: "Vytváram prostredie, kde ľudia môžu byť stopercentne sami sebou.", neg: "Vytváranie nezdravej emocionálnej závislosti na firme." },
-    { v: "Solidarita", pos: "Cítim prirodzenú zodpovednosť nezištne pomáhať ľuďom v núdzi.", neg: "Agresívne a povinné 'dobro' pod sociálnym nátlakom." },
-    { v: "Šťastie", pos: "Osobná pohoda a duševné zdravie sú viac než status či zisk.", neg: "Tyrania falošného šťastia; zakazovanie prejavov frustrácie." },
-    { v: "Mindfulness", pos: "Vážim si prítomný okamih a venujem ľuďom svoju plnú pozornosť.", neg: "Únik do pseudo-spirituality pre neschopnosť riadiť firmu." },
-    { v: "Rešpekt", pos: "Oceňujem rozmanitosť životných štýlov a nikoho nesúdim.", neg: "Vylučovanie kohokoľvek, kto položí racionálnu otázku." },
-    { v: "Zdieľanie", pos: "Verím v otvorenosť; rád zdieľam vedomosti aj vlastné emócie.", neg: "Strata profesionálnych hraníc a nútená intimita na mítingoch." },
-    { v: "Podpora", pos: "Vnímam sa ako človek, ktorý aktívne pomáha ostatným rásť.", neg: "Helikoptérový manažér – hasenie problémov za iných." },
-    { v: "Férovosť", pos: "Záleží mi na transparentnom delení zdrojov bez uprednostňovania.", neg: "Dogmatický purizmus znemožňujúci logické výnimky." },
-    { v: "Empatia", pos: "Dokážem sa hlboko vcítiť do prežívania iných a prispôsobiť sa.", neg: "Slepá submisivita zo strachu pred zranením citov iných." },
-    { v: "Spolupráca", pos: "Oveľa radšej pracujem v skupine na spoločnom cieli než sám.", neg: "Rozmazanie individuálnej zodpovednosti a alibizmus." },
-    { v: "Tolerancia", pos: "Vytváram prostredie odolné voči predsudkom a vítam diverzitu.", neg: "Tolerovanie flákačov na úkor výkonných a slušných ľudí." },
-    { v: "Pokora", pos: "Priznávam vlastné chyby a úctivo počúvam názory expertov.", neg: "Slabosť a neustále znižovanie vlastnej autority v kríze." },
-    { v: "Zhoda", pos: "Moje konanie smeruje k spájaniu ľudí a hľadaniu prienikov.", neg: "Mníchovská ústupčivosť; zrada stratégie kvôli krikľúňom." },
-    { v: "Zábava", pos: "Snažím sa brať život s ľahkosťou; humor je pre mňa nevyhnutnosť.", neg: "Infantilná povinná zábava maskujúca reálne problémy." }
+    { v: "Harmónia", pos: "Pôsobím ako empatický mediátor predchádzajúci otvoreným konfliktom.", neg: "Strach z konfrontácie vedúci k tolerovaniu toxicity a slabej morálky." },
+    { v: "Súdržnosť", pos: "Budujem silnú tímovú identitu a búram zbytočné korporátne bariéry.", neg: "Vytváranie dusivého sektárskeho prostredia a skupinového myslenia." },
+    { v: "Spravodlivosť", pos: "Zohľadňujem individuálne potreby a potrebu sociálnej spravodlivosti.", neg: "Presadzovanie absurdity kolektívnej viny; odmeňovanie najslabších rovnako." },
+    { v: "Rovnosť", pos: "Ku každému pristupujem s rovnakou úctou bez ohľadu na jeho funkčný status.", neg: "Absolútne popieranie hierarchie kompetencií vedúce k organizačnému chaosu." },
+    { v: "Konsenzus", pos: "Zapájam tím do rozhodovania pre hladkú a dobrovoľnú implementáciu zmien.", neg: "Kríza rozhodovania – neschopnosť urobiť krok bez súhlasu úplne každého." },
+    { v: "Spolupatričnosť", pos: "Vytváram komunitu, kde sa každý cíti vítaný taký, aký v skutočnosti je.", neg: "Emocionálna manipulácia a vytváranie nezdravej závislosti na 'rodine'." },
+    { v: "Solidarita", pos: "Nezištne pomáham kolegom v ťažkej životnej alebo zdravotnej situácii.", neg: "Agresívne 'dobro' – vyvíjanie nátlaku na vzdávanie sa voľného času a odmien." },
+    { v: "Šťastie", pos: "Odmietam paradigmu, že výkon je viac ako zdravie; dbám na psychickú pohodu.", neg: "Tyrania falošného šťastia; neprípustnosť prejaviť smútok či frustráciu." },
+    { v: "Mindfulness", pos: "Prejavujem plnú, nerušenú prítomnosť a hlboko počúvam potreby iných.", neg: "Únik do pseudo-spirituality a žargónu na zakrytie neschopnosti riadiť." },
+    { v: "Rešpekt", pos: "Oceňujem diverzitu skúseností a hodnotím ľudí podľa vnútorného charakteru.", neg: "Rešpekt ako zbraň; vylúčenie každého, kto položí racionálnu kritickú otázku." },
+    { v: "Zdieľanie", pos: "Likvidujem informačné monopoly a zavádzam platformy pre voľný tok know-how.", neg: "Brutálna strata hraníc; nútené zdieľanie súkromných tráum pred kolektívom." },
+    { v: "Podpora", pos: "Fungujem ako kouč a architekt rastu, ktorý pomáha ľuďom naplniť potenciál.", neg: "Vznik patologickej záchranárskej dynamiky; bránenie ľuďom v dospelom raste." },
+    { v: "Férovosť", pos: "Garantujem rovnaké príležitosti a transparentnú distribúciu projektov.", neg: "Bezcitný dogmatizmus zakazujúci urobiť aj logickú ľudskú výnimku." },
+    { v: "Empatia", pos: "Mám schopnosť kognitívneho vcítenia sa a prispôsobenia komunikácie.", neg: "Slepá submisivita; neschopnosť dať kritiku zo strachu pred zranením citov." },
+    { v: "Spolupráca", pos: "Rozbíjam silá a odmeňujem ľudí za to, ako pomohli uspieť aj iným tímom.", neg: "Totálne rozmazanie individuálnej zodpovednosti a schovávanie sa za kolektív." },
+    { v: "Tolerancia", pos: "Vytváram inkluzívne prostredie odolné voči predsudkom akéhokoľvek druhu.", neg: "Demotivujúce tolerovanie chronických flákačov na úkor poctivých ľudí." },
+    { v: "Pokora", pos: "Autenticky a otvorene priznávam vlastné manažérske chyby pred celým tímom.", neg: "Trápne znižovanie vlastnej autority; neschopnosť veliť ani v existenčnej kríze." },
+    { v: "Zhoda", pos: "Hľadám skutočný prienik obáv a riešení cez vysokú kultúru debaty.", neg: "Mníchovský ústupok; zrada stratégie len pre uspokojenie hlučnej menšiny." },
+    { v: "Zábava", pos: "Zavádzam prvky gamifikácie a humoru na uvoľnenie dlhotrvajúceho stresu.", neg: "Organizovanie infantilnej zábavy, ktorá znižuje dôstojnosť profesionálov." }
   ],
   YELLOW: [
-    { v: "Synergia", pos: "Spájam odlišné myšlienky do celku, ktorý funguje exponenciálne lepšie.", neg: "Umelé prepájanie nesúvisiacich vecí pre ideológiu." },
-    { v: "Komplexnosť", pos: "Vnímam situácie z viacerých uhlov naraz – psychologicky aj prakticky.", neg: "Stratenie schopnosti akcie kvôli nekonečným teóriám." },
-    { v: "Partnerstvo", pos: "Budujem vzťahy tak, aby profitovali všetky strany aj širší ekosystém.", neg: "Naivné odovzdávanie know-how konkurencii bez boja." },
-    { v: "Prepojenosť", pos: "Chápem, ako každý mikro-detail ovplyvňuje veľký globálny obraz.", neg: "Totálne rozptýlenie focusu a strata zamerania na zisk." },
-    { v: "Inšpiratívnosť", pos: "Viem podať zložitú víziu jednoducho a nadchnúť okolie pre budúcnosť.", neg: "Arogantný vizionár bez kontaktu s realitou bežných ľudí." },
-    { v: "Integrita", pos: "Konám v súlade s vnútorným presvedčením, no viem agilne meniť prístup.", neg: "Puristický extrémizmus odmietajúci pragmatický kompromis." },
-    { v: "Majstrovstvo", pos: "Chcem do hĺbky pochopiť ako funguje svet a neustále sa vzdelávam.", neg: "Elitárska veža zo slonoviny opovrhujúca operatívou." },
-    { v: "Spontánnosť", pos: "Dokážem okamžite a plynule zmeniť plány podľa vývoja situácie.", neg: "Impulzívne menenie pravidiel hry vedúce k vyhoreniu tímu." },
-    { v: "Seba-uvedomovanie", pos: "Dokážem izolovať vlastné ego a vedome prepínať štýl vedenia.", neg: "Narcistické zacyklenie sa vo vlastnej terapii a analýzach." },
-    { v: "Zhoda (Rádu)", pos: "Hľadám hlboký spoločný zmysel vecí, s ktorým sa stotožnia všetci.", neg: "Hľadanie vesmírnej harmónie, ktorá paralyzuje dnešné riešenia." }
+    { v: "Synergia", pos: "Prepájam zdanlivo nekompatibilné procesy do exponenciálne výkonného celku.", neg: "Umelé tlačenie do spolupráce projektov, ktoré k sebe logicky nepasujú." },
+    { v: "Komplexnosť", pos: "Analyzujem problémy multidimenzionálne a nachádzam systémové páky.", neg: "Stratenie schopnosti akcie kvôli nekonečnému akademickému teoretizovaniu." },
+    { v: "Partnerstvo", pos: "Dizajnujem udržateľné stratégie tak, aby profitoval celý širší ekosystém.", neg: "Rezignácia na obranu firmy a naivné odovzdávanie know-how konkurencii." },
+    { v: "Prepojenosť", pos: "Výborne chápem dopad lokálnych mikro-krokov na globálnu stratégiu firmy.", neg: "Totálne rozptýlenie focusu a zdrojov do desiatok irelevantných oblastí." },
+    { v: "Inšpiratívnosť", pos: "Cez majstrovskú komunikáciu nadchnem okolie pre zložitú víziu budúcnosti.", neg: "Zlyhanie komunikácie; pôsobenie ako odtrhnutý a arogantný vizionár." },
+    { v: "Integrita", pos: "Konám v hlbokom súlade s komplexnými etickými a fyzikálnymi zákonmi.", neg: "Puristický extrémizmus; odmietanie nutného pragmatického kompromisu." },
+    { v: "Majstrovstvo", pos: "Som celoživotným študentom princípov a uplatňujem koncept hlbokej práce.", neg: "Budovanie elitárskej veže zo slonoviny a opovrhovanie operatívou." },
+    { v: "Spontánnosť", pos: "Mám mimoriadnu agilitu pri zmenách na trhu bez straty vnútornej stability.", neg: "Katastrofálny rozklad a chaos spôsobený impulzívnym menením pravidiel." },
+    { v: "Seba-uvedomovanie", pos: "Brilantne izolujem vlastné ego a plynulo prepínam štýl vedenia podľa situácie.", neg: "Narcistické zacyklenie sa vo vlastnej terapii a analýzach rán z minulosti." },
+    { v: "Zhoda (Rádu)", pos: "Nachádzam hlboký zmysel (purpose), s ktorým sa tím prirodzene stotožní.", neg: "Hľadanie natoľko 'dokonalej' vesmírnej harmónie, že paralyzuje dnešok." }
   ]
+};
+
+const THEORY: any = {
+  BLUE: { 
+    name: "MODRÁ (Tier 1): Rád a Poriadok", 
+    col: "#2563eb", 
+    d: "Vaším kompasom je stabilita, morálka a zmysel pre povinnosť. Svet vnímate cez pravidlá, ktoré zabezpečujú bezpečie a predvídateľnosť. V tíme ste pilierom spoľahlivosti, no dajte si pozor, aby ste sa nestali väzňom vlastných procesov.",
+    f: "Trenie vzniká, ak sa Modrá zložka cíti ohrozená chaosom alebo neetickým správaním (Oranžová skratka)."
+  },
+  ORANGE: { 
+    name: "ORANŽOVÁ (Tier 1): Výkon a Úspech", 
+    col: "#ea580c", 
+    d: "Svet je pre vás ihriskom plným príležitostí. Orientujete sa na merateľné výsledky, efektivitu a strategické myslenie. Ceníte si kompetentnosť a pokrok. Rizikom je 'tunelové videnie' orientované na zisk, ktoré môže prehliadať ľudské emócie (Zelená) alebo dlhodobú stabilitu (Modrá).",
+    f: "Konflikt nastáva pri tlaku na rýchle výsledky na úkor času potrebného na budovanie vzťahov (Zelená)."
+  },
+  GREEN: { 
+    name: "ZELENÁ (Tier 1): Vzťahy a Harmónia", 
+    col: "#16a34a", 
+    d: "Ľudský faktor je pre vás prvoradý. Zameriavate sa na empatiu, inklúziu a súlad v komunite. Veríte, že úspech je výsledkom spokojnosti ľudí. Výzvou je udržať akcieschopnosť a neupadnúť do paralýzy z nekonečného hľadania konsenzu.",
+    f: "Trenie zažívate pri konfrontácii s chladnou logikou alebo hierarchickými príkazmi bez diskusie."
+  },
+  YELLOW: { 
+    name: "ŽLTÁ (Tier 2): Systémová Integrácia", 
+    col: "#ca8a04", 
+    d: "Predstavujete 'monumentálny skok' vo vedomí. Už nebojujete proti iným systémom, ale chápete ich nevyhnutnosť. Vidíte svet ako komplexný systém. Orientujete sa na funkčnosť bez tlaku ega. Dokážete prepínať medzi poriadkom, výkonom a empatiou podľa toho, čo situácia vyžaduje.",
+    f: "Pôsobíte arogantne pre ľudí z 1. rádu, ktorí nedokážu uchopiť vašu nelineárnu komplexnosť."
+  }
 };
 
 const FLAT_VALUES = Object.entries(VALUES_DB).flatMap(([lvl, items]: any) => 
   items.map((i: any) => ({ ...i, lvl }))
 );
 
-const THEORY: any = {
-  BLUE: { name: "MODRÁ: Systém a Poriadok", col: "#2563eb", d: "Vaším motorom je stabilita, morálka a zmysel pre povinnosť. Svet vnímate cez pravidlá, ktoré zabezpečujú bezpečie a predvídateľnosť. Ste pilierom spoľahlivosti v tíme." },
-  ORANGE: { name: "ORANŽOVÁ: Výkon a Úspech", col: "#ea580c", d: "Svet je pre vás ihriskom plným príležitostí. Orientujete sa na výsledky, efektivitu a strategické myslenie. Ceníte si kompetentnosť, pokrok a merateľný úspech." },
-  GREEN: { name: "ZELENÁ: Vzťahy a Komunita", col: "#16a34a", d: "Ľudský faktor je prvoradý. Zameriavate sa na empatiu, inklúziu a súlad v tíme. Veríte, že trvalý úspech je možný len vtedy, ak sú ľudia spokojní a vypočutí." },
-  YELLOW: { name: "ŽLTÁ: Synergia a Vízia", col: "#ca8a04", d: "Dokážete integrovať protiklady. Vidíte svet ako komplexný systém. Orientujete sa na funkčnosť, flexibilitu a riešenia bez ega. Ste prirodzeným inovátorom systémov." }
-};
-
-export default function App() {
+export default function GrowClubApp() {
   const [step, setStep] = useState(1);
   const [user, setUser] = useState({ name: '', code: '', context: '' });
   const [pos, setPos] = useState<string[]>([]);
@@ -122,7 +141,7 @@ export default function App() {
       });
       setStep(4);
     } catch (e) {
-      alert("Chyba pri ukladaní dát.");
+      alert("Chyba pri ukladaní.");
     }
     setIsLoading(false);
   };
@@ -134,117 +153,152 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1e1a34] text-white p-4 md:p-10 font-sans selection:bg-[#c7a1f7] selection:text-[#1e1a34]">
+    <div className="min-h-screen bg-[#0a0817] text-white p-4 md:p-10 font-sans selection:bg-[#c7a1f7] selection:text-[#0a0817]">
       <header className="max-w-5xl mx-auto text-center mb-10">
         <h1 className="font-serif text-4xl md:text-6xl tracking-tighter">FORBES <span className="text-[#c7a1f7]">GROWCLUB</span></h1>
-        <p className="text-[#c7a1f7]/50 uppercase tracking-[0.5em] text-[10px] font-black mt-2 italic">Values & Behavioral Analytics</p>
+        <p className="text-[#c7a1f7]/50 uppercase tracking-[0.5em] text-[10px] font-black mt-2 italic">Professional Behavioral Matice v3.2</p>
       </header>
 
-      <main className="max-w-5xl mx-auto bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-md shadow-2xl">
+      <main className="max-w-5xl mx-auto bg-[#1e1a34]/60 border border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-3xl shadow-2xl">
         <AnimatePresence mode="wait">
 
-          {/* STEP 1: PROFIL */}
+          {/* STEP 1: ONBOARDING */}
           {step === 1 && (
-            <motion.div initial={{opacity:0}} animate={{opacity:1}} className="p-8 md:p-16 space-y-8">
-              <h2 className="text-3xl font-serif mb-4">Nastavenie Assessmentu</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-[#c7a1f7] tracking-widest ml-1">Vaše Meno</label>
-                  <input placeholder="napr. Peter Novák" className="w-full bg-white/10 p-5 rounded-2xl border border-white/10 outline-none focus:border-[#c7a1f7]" onChange={e=>setUser({...user, name: e.target.value})} />
+            <motion.div initial={{opacity:0}} animate={{opacity:1}} className="p-8 md:p-16 space-y-10">
+              <div className="space-y-4">
+                <h2 className="text-4xl font-serif">Vitajte v hodnotovej diagnostike</h2>
+                <p className="text-white/60 leading-relaxed max-w-2xl">
+                  Špirálová dynamika (Spiral Dynamics) je evolučný model ľudských hodnôt. Pomáha nám pochopiť, prečo ľudia konajú tak, ako konajú, a kde v tímoch vzniká napätie. 
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase text-[#c7a1f7] tracking-widest block ml-1">Vaše Meno</label>
+                  <input placeholder="napr. Martin" className="w-full bg-white/5 p-5 rounded-2xl border border-white/10 focus:border-[#c7a1f7] outline-none transition-all" onChange={e=>setUser({...user, name: e.target.value})} />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-[#c7a1f7] tracking-widest ml-1">Kód Tímu</label>
-                  <input placeholder="napr. GROW2024" className="w-full bg-white/10 p-5 rounded-2xl border border-white/10 outline-none uppercase" onChange={e=>setUser({...user, code: e.target.value.toUpperCase()})} />
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase text-[#c7a1f7] tracking-widest block ml-1">Kód Tímu (pre zdieľanie)</label>
+                  <input placeholder="napr. CEO-TEAM" className="w-full bg-white/5 p-5 rounded-2xl border border-white/10 focus:border-[#c7a1f7] outline-none uppercase" onChange={e=>setUser({...user, code: e.target.value.toUpperCase()})} />
                 </div>
-                <div className="space-y-2 col-span-full">
-                  <label className="text-[10px] font-bold uppercase text-[#c7a1f7] tracking-widest ml-1">Kontext Hodnotenia</label>
-                  <select className="w-full bg-[#2a2448] p-5 rounded-2xl border border-white/10" onChange={e=>setUser({...user, context: e.target.value})}>
+                <div className="col-span-full space-y-4">
+                   <label className="text-[10px] font-black uppercase text-[#c7a1f7] tracking-widest block ml-1">Kontext Hodnotenia</label>
+                   <select className="w-full bg-[#2a2448] p-5 rounded-2xl border border-white/10 outline-none cursor-pointer" onChange={e=>setUser({...user, context: e.target.value})}>
                     <option value="">Zvoľte prostredie...</option>
                     <option value="Práca">Pracovné prostredie / Leadership</option>
                     <option value="Súkromie">Súkromný život / Rodina</option>
                   </select>
                 </div>
               </div>
-              <div className="p-5 bg-[#c7a1f7]/5 border border-[#c7a1f7]/20 rounded-2xl flex gap-4 items-start">
-                <Info className="text-[#c7a1f7] shrink-0" size={24} />
-                <p className="text-xs text-[#c7a1f7]/80 leading-relaxed">
-                  "Upozornenie: Váš výsledok nereprezentuje absolútne schopnosti, ale vašu vnútornú hierarchiu priorít. Zvolený profil ukazuje nastavenie v 'ideálnom dni', skutočnou skúškou hodnôt je stres."
+              <div className="p-6 bg-[#c7a1f7]/5 border border-[#c7a1f7]/20 rounded-3xl flex gap-5 items-center italic">
+                <Info className="text-[#c7a1f7] shrink-0" size={30} />
+                <p className="text-sm text-white/70">
+                  "Naše hodnoty sú adaptáciou na životné podmienky. V práci môžete fungovať z Oranžového výkonu, no doma zo Zelenej harmónie. Vyberte si jeden kontext."
                 </p>
               </div>
-              <button disabled={!user.name || !user.code || !user.context} className="w-full bg-[#c7a1f7] text-[#1e1a34] font-black p-5 rounded-full disabled:opacity-10 transition-all uppercase tracking-widest" onClick={()=>setStep(2)}>Začať analýzu</button>
+              <button disabled={!user.name || !user.code || !user.context} className="w-full bg-[#c7a1f7] text-[#1e1a34] font-black p-6 rounded-full disabled:opacity-10 transition-all uppercase tracking-[0.2em] shadow-lg shadow-[#c7a1f7]/20" onClick={()=>setStep(2)}>Začať analýzu</button>
             </motion.div>
           )}
 
           {/* STEP 2 & 3: FORCED CHOICE GRID */}
           {(step === 2 || step === 3) && (
-            <motion.div initial={{opacity:0}} animate={{opacity:1}} className="p-8">
-              <div className="flex justify-between items-center mb-8 bg-white/5 p-6 rounded-3xl border border-white/10">
-                <div>
-                  <h3 className="text-2xl font-serif">{step === 2 ? 'Hnací motor (+)' : 'Zóna odporu (x)'}</h3>
-                  <p className="text-white/40 text-xs mt-1">{step === 2 ? 'Vyberte presne TOP 7 prejavov, ktoré sú vám najbližšie.' : 'Vyberte presne TOP 7 prejavov, ktoré najviac odmietate.'}</p>
+            <motion.div initial={{opacity:0}} animate={{opacity:1}} className="p-8 md:p-12">
+              <div className="flex justify-between items-center mb-10 bg-white/5 p-8 rounded-[2rem] border border-white/5">
+                <div className="space-y-1">
+                  <h3 className="text-3xl font-serif flex items-center gap-3">
+                    {step === 2 ? <Target className="text-green-400" size={24}/> : <ShieldAlert className="text-red-400" size={24}/>}
+                    {step === 2 ? 'Fáza 1: Hnací motor' : 'Fáza 2: Zóna odporu'}
+                  </h3>
+                  <p className="text-white/40 text-xs">
+                    {step === 2 ? 'Vyberte 4 až 7 prejavov, ktoré sú pre vás v tomto prostredí najprirodzenejšie.' : 'Vyberte 4 až 7 výrokov, ktoré vo vás vyvolávajú silnú nechuť alebo ich odmietate.'}
+                  </p>
                 </div>
-                <div className="text-4xl font-serif text-[#c7a1f7]">{(step === 2 ? pos : neg).length} <span className="text-sm opacity-20">/ 7</span></div>
+                <div className="text-5xl font-serif text-[#c7a1f7] opacity-80">{(step === 2 ? pos : neg).length} <span className="text-sm opacity-20 uppercase tracking-widest">/ 7</span></div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {FLAT_VALUES.map((item: any, i: number) => {
                   const sel = step === 2 ? pos : neg;
                   const active = sel.includes(item.v);
+                  const disabled = sel.length >= 7 && !active;
                   return (
-                    <button key={i} disabled={sel.length >= 7 && !active} className={`text-left p-6 rounded-2xl border transition-all h-full flex flex-col justify-between min-h-[140px] ${active ? 'bg-[#c7a1f7] text-[#1e1a34] border-[#c7a1f7] shadow-xl shadow-[#c7a1f7]/20' : 'bg-white/5 border-white/5 hover:border-white/20'}`}
+                    <button key={i} disabled={disabled} className={`text-left p-6 rounded-3xl border transition-all h-full flex flex-col justify-between min-h-[160px] group ${active ? 'bg-[#c7a1f7] text-[#1e1a34] border-[#c7a1f7] shadow-xl' : 'bg-white/5 border-white/5 hover:border-white/20'} ${disabled ? 'opacity-20 grayscale' : ''}`}
                       onClick={() => {
                         const update = active ? sel.filter(v=>v!==item.v) : [...sel, item.v];
                         step === 2 ? setPos(update) : setNeg(update);
                       }}>
                       <div className="flex justify-between items-start">
-                        <span className={`text-[9px] font-black uppercase mb-3 tracking-tighter ${active ? 'text-[#1e1a34]/60' : 'text-[#c7a1f7]'}`}>{item.v}</span>
-                        {active && <CheckCircle2 size={14} />}
+                        <span className={`text-[10px] font-black uppercase mb-4 tracking-tight ${active ? 'text-[#1e1a34]/60' : 'text-[#c7a1f7]'}`}>{item.v}</span>
+                        {active && <CheckCircle2 size={16} />}
                       </div>
-                      <span className="text-[13px] leading-snug font-medium opacity-90">{step === 2 ? item.pos : item.neg}</span>
+                      <span className="text-[14px] leading-tight font-medium opacity-95">{step === 2 ? item.pos : item.neg}</span>
                     </button>
                   );
                 })}
               </div>
-              <div className="mt-12 flex justify-between items-center border-t border-white/10 pt-8">
-                <button className="text-white/20 text-xs font-bold uppercase tracking-widest hover:text-white" onClick={()=>setStep(step-1)}>Späť</button>
-                <button disabled={(step === 2 ? pos : neg).length < 7 || isLoading} className="bg-[#c7a1f7] text-[#1e1a34] font-black py-4 px-16 rounded-full disabled:opacity-10 transition-all uppercase text-sm tracking-widest" onClick={step===2 ? ()=>setStep(3) : submitResults}>
-                  {isLoading ? 'Ukladám...' : 'Pokračovať'}
+              <div className="mt-14 flex justify-between items-center border-t border-white/5 pt-10">
+                <button className="text-white/30 text-xs font-black uppercase tracking-[0.3em] hover:text-white" onClick={()=>setStep(step-1)}>← Späť</button>
+                <button disabled={(step === 2 ? pos : neg).length < 4 || isLoading} className="bg-[#c7a1f7] text-[#1e1a34] font-black py-5 px-20 rounded-full disabled:opacity-10 transition-all uppercase text-sm tracking-widest shadow-xl shadow-[#c7a1f7]/10" onClick={step===2 ? ()=>setStep(3) : submitResults}>
+                  {isLoading ? 'Spracúvam...' : 'Pokračovať'}
                 </button>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 4: INDIVIDUÁLNY REPORT */}
+          {/* STEP 4: ENHANCED INDIVIDUAL REPORT */}
           {step === 4 && (
             <motion.div initial={{opacity:0}} animate={{opacity:1}} className="p-8 md:p-16 space-y-16">
-              <div className="text-center">
-                <h2 className="text-4xl font-serif mb-2 tracking-tight">Váš Hodnotový Profil</h2>
-                <p className="text-white/30 uppercase tracking-[0.3em] text-[10px] font-bold">Vypracované pre: {user.name} • Kontext: {user.context}</p>
+              <div className="text-center space-y-4">
+                <h2 className="text-5xl font-serif tracking-tight">Individuálna Analýza Hodnôt</h2>
+                <div className="flex justify-center gap-3">
+                  <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] font-black text-[#c7a1f7] uppercase tracking-widest">{user.name}</span>
+                  <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] font-black text-white/40 uppercase tracking-widest">{user.context}</span>
+                </div>
+              </div>
+
+              {/* Education Intro */}
+              <div className="bg-[#c7a1f7]/5 p-10 rounded-[3rem] border border-[#c7a1f7]/10 space-y-6">
+                <h3 className="text-xl font-serif flex items-center gap-3 text-[#c7a1f7]"><BookOpen size={22}/> Čo je Špirálová dynamika?</h3>
+                <p className="text-sm leading-relaxed text-white/70">
+                   Váš výsledok je postavený na teórii prof. Clare W. Gravesa. Táto teória hovorí, že ľudské vedomie sa vyvíja v stupňoch (vMEMEs), ktoré reagujú na zložitosť prostredia. Každá farba predstavuje iný spôsob, ako vnímame 'čo je správne'. Naše hodnoty nie sú vytesané do kameňa – sú mapou nášho ukotvenia v konkrétnom čase a kontexte.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
+                {/* Drive Section */}
                 <div className="space-y-8">
-                   <h3 className="flex items-center gap-3 text-2xl font-serif text-green-400 border-b border-white/10 pb-4"><CheckCircle2 size={24}/> Hnací motor</h3>
+                   <div className="space-y-3">
+                      <h3 className="flex items-center gap-3 text-2xl font-serif text-green-400 border-b border-white/5 pb-4"><CheckCircle2 size={24}/> Hnací motor</h3>
+                      <p className="text-xs text-white/50 leading-relaxed italic">
+                        Tento profil ukazuje vaše nastavenie v 'ideálnom dni'. Definuje, čo vás motivuje k akcii a aké vzorce správania považujete za konštruktívne.
+                      </p>
+                   </div>
                    {Object.keys(THEORY).map(lvl => {
-                     const p = Math.round((stats.pos[lvl]/7)*100);
+                     const p = Math.round((stats.pos[lvl]/pos.length)*100);
                      return (
                        <div key={lvl} className="space-y-2">
-                         <div className="flex justify-between text-[10px] font-black uppercase tracking-widest"><span>{THEORY[lvl].name}</span><span>{p}%</span></div>
-                         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                         <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em]"><span>{THEORY[lvl].name}</span><span>{p}%</span></div>
+                         <div className="h-2.5 bg-white/5 rounded-full overflow-hidden">
                            <motion.div initial={{width:0}} animate={{width:`${p}%`}} className="h-full" style={{background: THEORY[lvl].col}} />
                          </div>
                        </div>
                      )
                    })}
                 </div>
+
+                {/* Shadow Section */}
                 <div className="space-y-8">
-                   <h3 className="flex items-center gap-3 text-2xl font-serif text-red-400 border-b border-white/10 pb-4"><ShieldAlert size={24}/> Zóna odporu</h3>
+                   <div className="space-y-3">
+                      <h3 className="flex items-center gap-3 text-2xl font-serif text-red-400 border-b border-white/5 pb-4"><ShieldAlert size={24}/> Zóna odporu</h3>
+                      <p className="text-xs text-white/50 leading-relaxed italic">
+                        Ukazuje vaše 'citlivé spúšťače'. Psychológia tieňa hovorí, že to, čo na iných najviac odmietame, odhaľuje naše najväčšie body napätia.
+                      </p>
+                   </div>
                    {Object.keys(THEORY).map(lvl => {
-                     const p = Math.round((stats.neg[lvl]/7)*100);
+                     const p = Math.round((stats.neg[lvl]/neg.length)*100);
                      return (
                        <div key={lvl} className="space-y-2">
-                         <div className="flex justify-between text-[10px] font-black uppercase tracking-widest"><span>{THEORY[lvl].name}</span><span>{p}%</span></div>
-                         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                           <motion.div initial={{width:0}} animate={{width:`${p}%`}} className="h-full opacity-60" style={{background: THEORY[lvl].col}} />
+                         <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em]"><span>{THEORY[lvl].name}</span><span>{p}%</span></div>
+                         <div className="h-2.5 bg-white/5 rounded-full overflow-hidden">
+                           <motion.div initial={{width:0}} animate={{width:`${p}%`}} className="h-full opacity-50" style={{background: THEORY[lvl].col}} />
                          </div>
                        </div>
                      )
@@ -252,59 +306,70 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-10">
-                 <div className="bg-white/5 p-10 rounded-[2.5rem] border border-white/10">
-                   <h4 className="font-black text-[#c7a1f7] uppercase text-[10px] mb-6 tracking-[0.3em]">Vaša TOP 7 zostava</h4>
-                   <div className="flex flex-wrap gap-2">
-                     {pos.map(v => <span key={v} className="bg-white/5 px-4 py-2 rounded-full text-xs font-semibold border border-white/10 italic text-white/80">{v}</span>)}
-                   </div>
-                 </div>
-                 <div className="bg-[#c7a1f7]/10 p-10 rounded-[2.5rem] border border-[#c7a1f7]/20 relative overflow-hidden">
-                   <div className="absolute top-[-20px] right-[-20px] opacity-10"><BarChart3 size={150} /></div>
-                   <h4 className="font-black text-[#c7a1f7] uppercase text-[10px] mb-4 tracking-[0.3em]">Dominantný vMEME systém</h4>
+              {/* Dominant Deep Dive */}
+              <div className="pt-10 border-t border-white/5 space-y-10">
+                 <div className="bg-white/5 p-12 rounded-[3rem] border border-white/10 relative overflow-hidden group">
+                   <div className="absolute top-[-30px] right-[-30px] opacity-10 group-hover:scale-110 transition-transform duration-700 text-[#c7a1f7]"><Target size={250} /></div>
+                   <h4 className="font-black text-[#c7a1f7] uppercase text-[10px] mb-6 tracking-[0.4em]">Detailná Analýza Dominancie</h4>
                    {(() => {
                       const dom = Object.keys(stats.pos).reduce((a,b) => stats.pos[a] > stats.pos[b] ? a : b);
                       return (
-                        <>
-                          <p className="text-2xl font-serif mb-4">{THEORY[dom].name}</p>
-                          <p className="text-sm opacity-70 leading-relaxed font-medium">{THEORY[dom].d}</p>
-                        </>
+                        <div className="space-y-6 relative z-10">
+                          <p className="text-4xl font-serif text-white">{THEORY[dom].name}</p>
+                          <p className="text-lg text-white/80 leading-relaxed italic font-medium max-w-3xl">{THEORY[dom].d}</p>
+                          <div className="p-6 bg-white/5 rounded-3xl border border-white/10 max-w-xl">
+                             <p className="text-xs font-black uppercase tracking-widest text-[#c7a1f7] mb-3">Dynamika v tíme</p>
+                             <p className="text-sm text-white/60 leading-relaxed">{THEORY[dom].f}</p>
+                          </div>
+                        </div>
                       )
                    })()}
                  </div>
+
+                 {/* Friction Matrix logic check for Individual */}
+                 <div className="bg-yellow-950/20 p-10 rounded-[3rem] border border-yellow-500/20 space-y-4">
+                    <h4 className="font-black text-yellow-500 uppercase text-[10px] tracking-[0.3em]">Váš osobný Friction Check (Trenie)</h4>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Skutočnou skúškou hodnôt nie je úspech, ale kríza. Ak váš <strong>Hnací motor</strong> obsahuje vysokú mieru výkonu (Oranžová), ale vaša <strong>Zóna odporu</strong> obsahuje poriadok (Modrá), hrozí u vás 'rebelantský' rozklad procesov pri hľadaní výsledkov. Trenie vzniká tam, kde jedna hodnota v stresovej situácii kanibalizuje druhú.
+                    </p>
+                 </div>
               </div>
 
-              <div className="bg-red-950/20 p-8 rounded-3xl border border-red-500/20 italic text-xs text-white/50 leading-relaxed">
-                "Psychológia nás učí, že to, čo na iných najviac odmietame, nám ukazuje naše najcitlivejšie spúšťače (tieň). Ak vás nejaký prístup extrémne irituje, berte to ako pozvánku na zamyslenie sa: Čo sa z tohto iného prístupu môžem konštruktívne naučiť?"
+              <div className="text-center pt-10 space-y-6 border-t border-white/5">
+                <p className="text-white/40 text-sm">Pre detailnejší rozbor vašich výsledkov a analýzu tímovej dynamiky kontaktujte mentora Forbes GrowClub:</p>
+                <div className="flex justify-center items-center gap-3 group">
+                   <Mail className="text-[#c7a1f7] group-hover:scale-125 transition-transform" size={24}/>
+                   <a href="mailto:roman.rac@growclub.sk" className="text-2xl font-serif text-white hover:text-[#c7a1f7] transition-all border-b-2 border-[#c7a1f7]/40 pb-1">roman.rac@growclub.sk</a>
+                </div>
               </div>
 
-              <button className="w-full bg-white text-[#1e1a34] font-black p-6 rounded-full uppercase tracking-widest text-sm hover:bg-[#c7a1f7] transition-all flex justify-center items-center gap-3" onClick={fetchTeamData}>
+              <button className="w-full bg-white text-[#1e1a34] font-black p-6 rounded-full uppercase tracking-[0.3em] text-sm hover:bg-[#c7a1f7] transition-all flex justify-center items-center gap-3 shadow-2xl" onClick={fetchTeamData}>
                 Zobraziť Tímový Dashboard <LayoutDashboard size={20} />
               </button>
             </motion.div>
           )}
 
-          {/* STEP 5: TEAM DASHBOARD */}
+          {/* STEP 5: TEAM DASHBOARD (Simplified) */}
           {step === 5 && (
             <motion.div initial={{opacity:0}} animate={{opacity:1}} className="p-8 md:p-16 space-y-12">
                <div className="flex justify-between items-center border-b border-white/10 pb-8">
                  <div>
-                    <h2 className="text-4xl font-serif tracking-tight leading-none">Tímový Dashboard</h2>
-                    <p className="text-[#c7a1f7] text-[10px] font-black uppercase tracking-[0.4em] mt-3">ANALÝZA TÍMU: {user.code} • {teamData.length} ČLENOV</p>
+                    <h2 className="text-4xl font-serif tracking-tight leading-none">Tímová Dynamika</h2>
+                    <p className="text-[#c7a1f7] text-[10px] font-black uppercase tracking-[0.4em] mt-3">{user.code} • ANALÝZA {teamData.length} PROFILOV</p>
                  </div>
-                 <BarChart3 size={40} className="text-white/10" />
+                 <BarChart3 size={44} className="text-white/5" />
                </div>
 
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
                  <div className="space-y-10">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 italic">Zloženie tímu (Kolektívny priemer)</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 italic">Kolektívny priemer (Hnací motor)</h3>
                     {Object.keys(THEORY).map(lvl => {
-                      const total = teamData.length * 7;
+                      const totalPossible = teamData.length * 7;
                       const sum = teamData.reduce((acc, curr) => acc + (curr.pos_scores[lvl] || 0), 0);
-                      const perc = total > 0 ? Math.round((sum / total) * 100) : 0;
+                      const perc = totalPossible > 0 ? Math.round((sum / totalPossible) * 100) : 0;
                       return (
                         <div key={lvl} className="space-y-3">
-                          <div className="flex justify-between text-[11px] font-black uppercase tracking-widest"><span>{THEORY[lvl].name}</span><span>{perc}%</span></div>
+                          <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-white/80"><span>{THEORY[lvl].name}</span><span>{perc}%</span></div>
                           <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                             <motion.div initial={{width:0}} animate={{width: `${perc}%`}} className="h-full shadow-lg shadow-[#c7a1f7]/10" style={{background: THEORY[lvl].col}} />
                           </div>
@@ -313,36 +378,36 @@ export default function App() {
                     })}
                  </div>
 
-                 <div className="space-y-6 bg-white/5 p-10 rounded-[3rem] border border-white/10 relative overflow-hidden">
-                    <div className="absolute top-[-10px] right-[-10px] text-yellow-500 opacity-5"><AlertTriangle size={150} /></div>
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex items-center gap-2 mb-4 italic">
+                 <div className="space-y-6 bg-white/5 p-12 rounded-[3.5rem] border border-white/10 relative overflow-hidden">
+                    <div className="absolute top-[-10px] right-[-10px] text-yellow-500 opacity-5"><AlertTriangle size={180} /></div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex items-center gap-2 mb-6 italic">
                       <AlertTriangle size={14} className="text-yellow-500" /> Friction Matrix (Analýza trenia)
                     </h3>
-                    <div className="space-y-5">
-                       <div className="p-6 bg-orange-500/10 border border-orange-500/20 rounded-[2rem]">
-                          <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Výkon vs. Konsenzus</p>
-                          <p className="text-xs text-white/60 leading-relaxed font-medium italic">Vysoký Oranžový priemer v kombinácii so Zelenou rezistenciou naznačuje riziko tlaku na výsledky na úkor tímu.</p>
+                    <div className="space-y-6">
+                       <div className="p-8 bg-orange-500/10 border border-orange-500/20 rounded-[2.5rem]">
+                          <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Výkon vs. Konsenzus (Orange vs Green)</p>
+                          <p className="text-xs text-white/60 leading-relaxed font-medium italic">Ak je priemerný hnací motor tímu Oranžový a súčasne existuje silná Zelená rezistencia, hrozí rozpad tímu z vnútra kvôli pocitu bezcitnosti.</p>
                        </div>
-                       <div className="p-6 bg-blue-500/10 border border-blue-500/20 rounded-[2rem]">
-                          <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2">Inovácie vs. Poriadok</p>
-                          <p className="text-xs text-white/60 leading-relaxed font-medium italic">Modrá rezistencia v tíme signalizuje silnú alergiu na prebytočnú byrokraciu a statické pravidlá.</p>
+                       <div className="p-8 bg-blue-500/10 border border-blue-500/20 rounded-[2.5rem]">
+                          <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2">Inovácie vs. Poriadok (Orange vs Blue)</p>
+                          <p className="text-xs text-white/60 leading-relaxed font-medium italic">Modrá rezistencia v tíme signalizuje alergiu na pravidlá. V čase rastu to môže viesť k nebezpečnému chaosu a strate kontroly nad dátami.</p>
                        </div>
                     </div>
                  </div>
                </div>
 
-               <div className="space-y-8 pt-10 border-t border-white/5">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 italic">Kolektívny cloud hodnôt tímu</h3>
-                  <div className="flex flex-wrap gap-2">
+               <div className="space-y-8 pt-14 border-t border-white/5">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 italic">Unikátne hodnotové ukotvenia v tíme</h3>
+                  <div className="flex flex-wrap gap-3">
                     {Array.from(new Set(teamData.flatMap(d => d.pos_labels))).map((label, idx) => (
-                      <span key={idx} className="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-[#c7a1f7] italic tracking-tight">
+                      <span key={idx} className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-[#c7a1f7] italic tracking-tight hover:bg-[#c7a1f7]/10 transition-all cursor-default">
                         #{label}
                       </span>
                     ))}
                   </div>
                </div>
                
-               <button onClick={()=>location.reload()} className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-white transition-all underline block mx-auto pt-10">← Začať nový assessment</button>
+               <button onClick={()=>location.reload()} className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-all underline block mx-auto pt-20">← Späť na úvodnú obrazovku</button>
             </motion.div>
           )}
 
@@ -350,7 +415,7 @@ export default function App() {
       </main>
       
       <footer className="max-w-4xl mx-auto mt-12 text-center text-white/5 text-[9px] font-black uppercase tracking-[1em]">
-        FORBES GROWCLUB • SPIRAL DYNAMICS TEAM ENGINE v3.0 • POWERED BY SUPABASE
+        © 2026 FORBES GROWCLUB • METODOLÓGIA ŠPIRÁLOVEJ DYNAMIKY • POWERED BY SUPABASE
       </footer>
     </div>
   );
